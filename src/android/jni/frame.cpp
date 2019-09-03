@@ -154,7 +154,8 @@ Java_com_intel_realsense_librealsense_Pointcloud_nCalculate(JNIEnv *env, jclass 
     jsize length = env->GetArrayLength(data);
     auto pointCloud = reinterpret_cast<rs2::pointcloud *>(handle);
     rs2::frame frame = reinterpret_cast<rs2_frame *>(depthFrame);
-    env->SetFloatArrayRegion(data, 0, length, reinterpret_cast<const jfloat *>(pointCloud->calculate(frame)));
+    auto points = pointCloud->calculate(frame);
+    env->SetFloatArrayRegion(data, 0, length, reinterpret_cast<const jfloat *>(rs2_get_frame_data(reinterpret_cast<const rs2_frame *>(&points), &e)));
     handle_error(env, e);
 }
 
