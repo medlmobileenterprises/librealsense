@@ -19,9 +19,14 @@ public class Pointcloud extends Filter {
     }
 
     public void mapTo(Frame frame) {
-        nMapTo((mHandle, frame.mHandle);
+        nMapTo(mHandle, frame.mHandle);
+    }
+
+    public void calculate(Frame frame, float[] data) {
+        nCalculate(getHandle(), frame.mHandle, data);
     }
 
     private static native long nCreate(long queueHandle);
     private static native void nMapTo(long handle, long mappedHandle);
+    private static native void nCalculate(long handle, long frameHandle, float[] data);
 }

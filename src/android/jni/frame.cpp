@@ -142,9 +142,19 @@ Java_com_intel_realsense_librealsense_Points_nExportToPly(JNIEnv *env, jclass ty
 extern "C" JNIEXPORT void JNICALL
 Java_com_intel_realsense_librealsense_Pointcloud_nMapTo(JNIEnv *env, jclass type, jlong handle, jlong mapped) {
     rs2_error *e = NULL;
-    auto pointcloud = reinterpret_cast<rs2::pointcloud *>(handle);
+    auto pointCloud = reinterpret_cast<rs2::pointcloud *>(handle);
     rs2::frame mappedFrame = reinterpret_cast<rs2_frame *>(mapped);
-    pointcloud->map_to(mappedFrame);
+    pointCloud->map_to(mappedFrame);
+    handle_error(env, e);
+}
+
+extern "C" JNIEXPORT void JNICALL
+Java_com_intel_realsense_librealsense_Pointcloud_nCalculate(JNIEnv *env, jclass type, jlong handle, jlong depthFrame, jfloatArray data) {
+    rs2_error *e = NULL;
+    jsize length = env->GetArrayLength(data);
+    auto pointCloud = reinterpret_cast<rs2::pointcloud *>(handle);
+    rs2::frame frame = reinterpret_cast<rs2_frame *>(depthFrame);
+    env->SetFloatArrayRegion(data, 0, length, reinterpret_cast<const jfloat *>(pointCloud->calculate(frame)));
     handle_error(env, e);
 }
 
