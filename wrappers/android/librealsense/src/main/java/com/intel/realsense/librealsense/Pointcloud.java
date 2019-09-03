@@ -18,5 +18,10 @@ public class Pointcloud extends Filter {
         setValue(Option.STREAM_INDEX_FILTER, index);
     }
 
+    public void mapTo(Frame frame) {
+        nMapTo((mHandle, frame.mHandle);
+    }
+
     private static native long nCreate(long queueHandle);
+    private static native void nMapTo(long handle, long mappedHandle);
 }

@@ -2,6 +2,7 @@
 // Copyright(c) 2019 Intel Corporation. All Rights Reserved.
 
 #include <jni.h>
+#include <proc/pointcloud.h>
 #include "error.h"
 #include "../../../include/librealsense2/rs.h"
 
@@ -136,6 +137,15 @@ Java_com_intel_realsense_librealsense_Points_nExportToPly(JNIEnv *env, jclass ty
                       reinterpret_cast<rs2_frame *>(textureHandle), &e);
     handle_error(env, e);
     env->ReleaseStringUTFChars(filePath_, filePath);
+}
+
+extern "C" JNIEXPORT void JNICALL
+Java_com_intel_realsense_librealsense_Pointcloud_nMapTo(JNIEnv *env, jclass type, jlong handle, jlong mapped) {
+    rs2_error *e = NULL;
+    auto pointcloud = reinterpret_cast<rs2::pointcloud *>(handle);
+    rs2::frame mappedFrame = reinterpret_cast<rs2_frame *>(mapped);
+    pointcloud->map_to(mappedFrame);
+    handle_error(env, e);
 }
 
 extern "C" JNIEXPORT jdouble JNICALL
