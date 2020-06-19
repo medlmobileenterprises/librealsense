@@ -34,6 +34,10 @@
 #include "media/playback/playback_device.h"
 #include "stream.h"
 #include "../include/librealsense2/h/rs_types.h"
+// 3rd party header for writing png files
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "../third-party/stb_image_write.h"
+
 #include "pipeline/pipeline.h"
 #include "environment.h"
 #include "proc/temporal-filter.h"
@@ -2962,3 +2966,12 @@ void rs2_load_json(rs2_device* dev, const void* json_content, unsigned content_s
     serializable->load_json(std::string(static_cast<const char*>(json_content), content_size));
 }
 HANDLE_EXCEPTIONS_AND_RETURN(, dev, json_content, content_size)
+
+int rs2_save_jpg(const rs2_frame* frameref, const char* filename,  rs2_error** error) BEGIN_API_CALL {
+    VALIDATE_NOT_NULL(frameref);
+    VALIDATE_NOT_NULL(filename);
+    auto vf = VALIDATE_INTERFACE(((frame_interface*)frameref), librealsense::video_frame);
+    int file = stbi_write_jpg(filename, vf->get_width(), vf->get_height(), 3, vf->get_frame_data(), 90);
+    return file;
+}
+HANDLE_EXCEPTIONS_AND_RETURN(0, frameref, filename)

@@ -10,18 +10,23 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.intel.realsense.librealsense.Colorizer;
 import com.intel.realsense.librealsense.Config;
 import com.intel.realsense.librealsense.DeviceList;
 import com.intel.realsense.librealsense.DeviceListener;
+import com.intel.realsense.librealsense.Extension;
 import com.intel.realsense.librealsense.FrameSet;
 import com.intel.realsense.librealsense.GLRsSurfaceView;
 import com.intel.realsense.librealsense.Pipeline;
 import com.intel.realsense.librealsense.PipelineProfile;
 import com.intel.realsense.librealsense.RsContext;
 import com.intel.realsense.librealsense.StreamType;
+import com.intel.realsense.librealsense.VideoFrame;
+
+import java.io.File;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "librs capture example";
@@ -37,7 +42,9 @@ public class MainActivity extends AppCompatActivity {
 
     private Pipeline mPipeline;
     private Colorizer mColorizer;
+    private Button captureButton;
     private RsContext mRsContext;
+    private boolean shouldrecord = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +54,13 @@ public class MainActivity extends AppCompatActivity {
         mAppContext = getApplicationContext();
         mBackGroundText = findViewById(R.id.connectCameraText);
         mGLSurfaceView = findViewById(R.id.glSurfaceView);
+        captureButton = findViewById(R.id.captureButton);
+        captureButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                shouldrecord = true;
+            }
+        });
         mGLSurfaceView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
             | View.SYSTEM_UI_FLAG_FULLSCREEN
             | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
@@ -146,7 +160,17 @@ public class MainActivity extends AppCompatActivity {
             try {
                 try(FrameSet frames = mPipeline.waitForFrames(1000)) {
                     try(FrameSet processed = frames.applyFilter(mColorizer)) {
-                        mGLSurfaceView.upload(processed);
+
+                        File file = new File(mAppContext.getExternalFilesDir(null), "depth.jpg");
+                        if (shouldrecord) {
+                            processed.first(StreamType.DEPTH).as(Extension.VIDEO_FRAME).savePng(file.getAbsolutePath());
+                            File file1 = new File(mAppContext.getExternalFilesDir(null), "color.jpg");
+                            processed.first(StreamType.COLOR).as(Extension.VIDEO_FRAME).savePng(file1.getAbsolutePath());
+                            shouldrecord = false;
+                        } else {
+                            mGLSurfaceView.upload(processed);
+                        }
+
                     }
                 }
                 mHandler.post(mStreaming);

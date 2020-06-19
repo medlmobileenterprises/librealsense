@@ -58,6 +58,9 @@ public class Frame extends LrsClass implements Cloneable{
         return this;
     }
 
+    public int saveJpg(String fileName) {
+        return nSaveToFile(mHandle, fileName);
+    }
     @Override
     public void close() {
         if(mOwner)
@@ -82,4 +85,5 @@ public class Frame extends LrsClass implements Cloneable{
     private static native int nGetTimestampDomain(long handle);
     private static native long nGetMetadata(long handle, int metadata_type);
     private static native boolean nSupportsMetadata(long handle, int metadata_type);
+    private static native int nSaveToFile(long handle, String fileName);
 }
