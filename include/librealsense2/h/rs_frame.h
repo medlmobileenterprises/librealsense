@@ -313,6 +313,8 @@ void rs2_synthetic_frame_ready(rs2_source* source, rs2_frame* frame, rs2_error**
 */
 void rs2_pose_frame_get_pose_data(const rs2_frame* frame, rs2_pose* pose, rs2_error** error);
 
+int rs2_save_jpg(const rs2_frame* frameref, const char* filename, rs2_error** error);
+
 #ifdef __cplusplus
 }
 #endif

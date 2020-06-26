@@ -4,6 +4,8 @@
 #include <jni.h>
 #include "error.h"
 #include "../../../include/librealsense2/rs.h"
+#include "../../../third-party/stb_image_write.h"
+
 
 extern "C" JNIEXPORT void JNICALL
 Java_com_intel_realsense_librealsense_Frame_nAddRef(JNIEnv *env, jclass type, jlong handle) {
@@ -175,4 +177,34 @@ Java_com_intel_realsense_librealsense_Frame_nGetMetadata(JNIEnv *env, jclass typ
                                      static_cast<rs2_frame_metadata_value>(metadata_type), &e);
     handle_error(env, e);
     return rv;
+}
+
+extern "C" JNIEXPORT jboolean JNICALL
+Java_com_intel_realsense_librealsense_Frame_nSupportsMetadata(JNIEnv *env, jclass type, jlong handle,
+                                                         jint metadata_type) {
+    rs2_error *e = NULL;
+    int rv = rs2_supports_frame_metadata(reinterpret_cast<const rs2_frame *>(handle),
+                                     static_cast<rs2_frame_metadata_value>(metadata_type), &e);
+    handle_error(env, e);
+    return rv > 0;
+}
+
+//extern "C" JNIEXPORT jint JNICALL
+//Java_com_intel_realsense_librealsense_Frame_nSaveToFile(JNIEnv *env, jclass type, jlong handle, jstring filePath_) {
+//    rs2_error *e = NULL;
+//    const rs2_frame *frame = reinterpret_cast<const rs2_frame *>(handle);
+//    const char *filePath = env->GetStringUTFChars(filePath_, 0);
+//
+//    int file = stbi_write_png(filePath, rs2_get_frame_width(frame, &e), rs2_get_frame_height(frame, &e),
+//		rs2_get_frame_bits_per_pixel(frame, &e), rs2_get_frame_data(frame, &e), rs2_get_frame_stride_in_bytes(frame, &e));
+//    handle_error(env, e);
+//    env->ReleaseStringUTFChars(filePath_, filePath);
+//    return file;
+//}
+extern "C" JNIEXPORT jint JNICALL
+Java_com_intel_realsense_librealsense_Frame_nSaveToFile(JNIEnv *env, jclass type, jlong handle, jstring filePath_) {
+    rs2_error *e = NULL;
+    const char *filePath = env->GetStringUTFChars(filePath_, 0);
+    int file = rs2_save_jpg(reinterpret_cast<const rs2_frame *>(handle), filePath, &e);
+    return file;
 }
